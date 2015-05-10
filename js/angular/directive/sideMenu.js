@@ -22,6 +22,7 @@
  * @param {string} side Which side the side menu is currently on.  Allowed values: 'left' or 'right'.
  * @param {boolean=} is-enabled Whether this side menu is enabled.
  * @param {number=} width How many pixels wide the side menu should be.  Defaults to 275.
+ * @param {number=} height How many pixels high the top menu should be.  Defaults to 450.
  */
 IonicModule
 .directive('ionSideMenu', function() {
@@ -31,7 +32,8 @@ IonicModule
     scope: true,
     compile: function(element, attr) {
       angular.isUndefined(attr.isEnabled) && attr.$set('isEnabled', 'true');
-      angular.isUndefined(attr.width) && attr.$set('width', '275');
+      angular.isUndefined(attr.height) && attr.$set('height', '450');
+      angular.isUndefined(attr.width) && attr.$set('width', '275');  
 
       element.addClass('menu menu-' + attr.side);
 
@@ -40,6 +42,8 @@ IonicModule
 
         var sideMenu = sideMenuCtrl[$scope.side] = new ionic.views.SideMenu({
           width: attr.width,
+          height: attr.height,
+          side: attr.side,
           el: $element[0],
           isEnabled: true
         });
@@ -50,6 +54,12 @@ IonicModule
             sideMenu.setWidth(+val);
           }
         });
+        $scope.$watch($attr.height, function(val) {
+          var numberVal = +val;
+          if (numberVal && numberVal == val) {
+            sideMenu.setHeight(+val);
+          }
+        });
         $scope.$watch($attr.isEnabled, function(val) {
           sideMenu.setIsEnabled(!!val);
         });
@@ -57,4 +67,3 @@ IonicModule
     }
   };
 });
-

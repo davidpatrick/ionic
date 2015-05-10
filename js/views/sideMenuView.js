@@ -10,14 +10,23 @@
     initialize: function(opts) {
       this.el = opts.el;
       this.isEnabled = (typeof opts.isEnabled === 'undefined') ? true : opts.isEnabled;
+      this.side = opts.side;
       this.setWidth(opts.width);
+      this.setHeight(opts.height);
     },
     getFullWidth: function() {
       return this.width;
     },
+    getFullHeight: function() {
+      return this.height;
+    },
     setWidth: function(width) {
       this.width = width;
-      this.el.style.width = width + 'px';
+      this.el.style.width = this.side == "top" ? "100%" : width + 'px';
+    },
+    setHeight: function(height) {
+      this.height = height;
+      this.el.style.height = this.side != "top" ? "100%" : height + 'px';
     },
     setIsEnabled: function(isEnabled) {
       this.isEnabled = isEnabled;
@@ -62,6 +71,12 @@
     },
     setTranslateX: ionic.animationFrameThrottle(function(x) {
       this.el.style[ionic.CSS.TRANSFORM] = 'translate3d(' + x + 'px, 0, 0)';
+    }),
+    getTranslateY: function() {
+      return parseFloat(this.el.style[ionic.CSS.TRANSFORM].replace('translate3d(', '').split(',')[1]);
+    },
+    setTranslateY: ionic.animationFrameThrottle(function(x) {
+      this.el.style[ionic.CSS.TRANSFORM] = 'translate3d(0,' + x + 'px, 0)';
     })
   });
 

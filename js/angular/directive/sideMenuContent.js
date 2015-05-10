@@ -44,6 +44,7 @@ function($timeout, $ionicGesture, $window) {
       function prelink($scope, $element, $attr, sideMenuCtrl) {
         var startCoord = null;
         var primaryScrollAxis = null;
+        $scope.side = $attr.side || 'left';
 
         if (isDefined(attr.dragContent)) {
           $scope.$watch(attr.dragContent, function(value) {
@@ -57,6 +58,9 @@ function($timeout, $ionicGesture, $window) {
           $scope.$watch(attr.edgeDragThreshold, function(value) {
             sideMenuCtrl.edgeDragThreshold(value);
           });
+        // Enable Drag Threshold for Top Menu to avoid interferance with main view
+        } else if ($scope.side == 'top') {
+          sideMenuCtrl.edgeDragThreshold(60);
         }
 
         // Listen for taps on the content to close the menu
@@ -72,7 +76,7 @@ function($timeout, $ionicGesture, $window) {
         }
 
         function onDragX(e) {
-          if (!sideMenuCtrl.isDraggableTarget(e)) return;
+          if (!sideMenuCtrl.isDraggableTarget(e) || $scope.side == 'top') return;
 
           if (getPrimaryScrollAxis(e) == 'x') {
             sideMenuCtrl._handleDrag(e);
@@ -81,7 +85,10 @@ function($timeout, $ionicGesture, $window) {
         }
 
         function onDragY(e) {
-          if (getPrimaryScrollAxis(e) == 'x') {
+          if (!sideMenuCtrl.isDraggableTarget(e) || $scope.side !== 'top') return;
+
+          if (getPrimaryScrollAxis(e) == 'y') {
+            sideMenuCtrl._handleDrag(e);
             e.gesture.srcEvent.preventDefault();
           }
         }
@@ -136,11 +143,21 @@ function($timeout, $ionicGesture, $window) {
           getTranslateX: function() {
             return $scope.sideMenuContentTranslateX || 0;
           },
+          getTranslateY: function() {
+            return $scope.sideMenuContentTranslateY || 0;
+          },
           setTranslateX: ionic.animationFrameThrottle(function(amount) {
             var xTransform = content.offsetX + amount;
             $element[0].style[ionic.CSS.TRANSFORM] = 'translate3d(' + xTransform + 'px,0,0)';
             $timeout(function() {
               $scope.sideMenuContentTranslateX = amount;
+            });
+          }),
+          setTranslateY: ionic.animationFrameThrottle(function(amount) {
+            var yTransform = content.offsetY + amount;
+            $element[0].style[ionic.CSS.TRANSFORM] = 'translate3d(0,' + yTransform + 'px,0)';
+            $timeout(function() {
+              $scope.sideMenuContentTranslateY = amount;
             });
           }),
           setMarginLeft: ionic.animationFrameThrottle(function(amount) {
@@ -167,6 +184,18 @@ function($timeout, $ionicGesture, $window) {
             // reset incase left gets grabby
             $element[0].style[ionic.CSS.TRANSFORM] = 'translate3d(0,0,0)';
           }),
+          setMarginTop: ionic.animationFrameThrottle(function(amount) {
+            if (amount) {
+              amount = parseInt(amount, 10);
+              $element[0].style[ionic.CSS.TRANSFORM] = 'translate3d(0,' + amount + 'px,0)';
+              $element[0].style.height = ($window.innerHeight - amount) + 'px';
+              content.offsetY = amount;
+            } else {
+              $element[0].style[ionic.CSS.TRANSFORM] = 'translate3d(0,0,0)';
+              $element[0].style.width = '';
+              content.offsetY = 0;
+            }
+          }),
           enableAnimation: function() {
             $scope.animationEnabled = true;
             $element[0].classList.add('menu-animated');
@@ -175,7 +204,9 @@ function($timeout, $ionicGesture, $window) {
             $scope.animationEnabled = false;
             $element[0].classList.remove('menu-animated');
           },
-          offsetX: 0
+          offsetX: 0,
+          offsetY: 0,
+          side: $scope.side
         };
 
         sideMenuCtrl.setContent(content);
