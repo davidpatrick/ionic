@@ -203,6 +203,11 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
     var maxRight = self.right && self.right.width || 0;
     var maxTop = self.top && self.top.height || 0;
 
+    if (self.content && self.content.side == 'top') {
+      var setAmount = amount > maxTop ? maxTop : amount
+      self.content.setTranslateY(setAmount);
+      return;
+    }
     // Check if we can move to that side, depending if the left/right panel is enabled
     if (!(self.left && self.left.isEnabled) && amount > 0) {
       self.content.setTranslateX(0);
@@ -234,35 +239,28 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
       return;
     }
 
-    self.content.side == 'top' ? self.content.setTranslateY(amount) : self.content.setTranslateX(amount);
+    self.content.setTranslateX(amount);
     
-    /** 
-    * When the Top Menu is enabled the left/right menu will not trigger, 
-    * so do not change the z-index of menus.
-    */
-    if (self.content.side != 'top') {
-      if (amount >= 0) {
-        leftShowing = true;
-        rightShowing = false;
+    if (amount >= 0) {
+      leftShowing = true;
+      rightShowing = false;
 
-        if (amount > 0) {
-          // Push the z-index of the right menu down
-          self.right && self.right.pushDown && self.right.pushDown();
-          // Bring the z-index of the left menu up
-          self.left && self.left.bringUp && self.left.bringUp();
-        }
-      } else {
-        rightShowing = true;
-        leftShowing = false;
-
-        // Bring the z-index of the right menu up
-        self.right && self.right.bringUp && self.right.bringUp();
-        // Push the z-index of the left menu down
-        self.left && self.left.pushDown && self.left.pushDown();
+      if (amount > 0) {
+        // Push the z-index of the right menu down
+        self.right && self.right.pushDown && self.right.pushDown();
+        // Bring the z-index of the left menu up
+        self.left && self.left.bringUp && self.left.bringUp();
       }
+    } else {
+      rightShowing = true;
+      leftShowing = false;
+
+      // Bring the z-index of the right menu up
+      self.right && self.right.bringUp && self.right.bringUp();
+      // Push the z-index of the left menu down
+      self.left && self.left.pushDown && self.left.pushDown();
     }
   };
-
   /**
    * Given an event object, find the final resting position of this side
    * menu. For example, if the user "throws" the content to the right and
