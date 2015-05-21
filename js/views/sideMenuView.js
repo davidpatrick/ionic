@@ -75,8 +75,8 @@
     getTranslateY: function() {
       return parseFloat(this.el.style[ionic.CSS.TRANSFORM].replace('translate3d(', '').split(',')[1]);
     },
-    setTranslateY: ionic.animationFrameThrottle(function(x) {
-      this.el.style[ionic.CSS.TRANSFORM] = 'translate3d(0,' + x + 'px, 0)';
+    setTranslateY: ionic.animationFrameThrottle(function(y) {
+      this.el.style[ionic.CSS.TRANSFORM] = 'translate3d(0,' + y + 'px, 0)';
     })
   });
 

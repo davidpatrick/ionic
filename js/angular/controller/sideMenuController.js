@@ -123,7 +123,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
    * getTranslateX will grab either positive or negative for left (positive), or right (negative)
    */
   self.getOpenAmount = function() {
-    if ( self.content && self.content.side == 'top') {
+    if ( self.content.topMenuEnabled) {
       return self.content.getTranslateY();
     } else {
       return self.content && self.content.getTranslateX() || 0;
@@ -137,7 +137,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
    */
   self.getOpenRatio = function() {
     var amount = self.getOpenAmount();
-    if (self.content.side == 'top') {
+    if (self.content.topMenuEnabled) {
       return amount / self.top.height;
     } else if (amount >= 0) {
       return amount / self.left.width;
@@ -166,7 +166,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
   self.openPercentage = function(percentage) {
     var p = percentage / 100;
 
-    if (self.content.side == 'top') {
+    if (self.content.topMenuEnabled) {
       self.openAmount(self.top.height * p);
     } else {
       if (self.left && percentage >= 0) {
@@ -203,9 +203,10 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
     var maxRight = self.right && self.right.width || 0;
     var maxTop = self.top && self.top.height || 0;
 
-    if (self.content && self.content.side == 'top') {
+    // If TopMenu Enabled there is no need to go further.
+    if (self.content.topMenuEnabled) {
       var setAmount = amount > maxTop ? maxTop : amount
-      self.content.setTranslateY(setAmount);
+      self.content.setTranslateY(setAmount < 0 ? 0 : setAmount);
       return;
     }
     // Check if we can move to that side, depending if the left/right panel is enabled
@@ -231,11 +232,6 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
 
     if (rightShowing && amount < -maxRight) {
       self.content.setTranslateX(-maxRight);
-      return;
-    }
-
-    if (topShowing && amount < maxTop) {
-      self.content.setTranslateY(maxTop);
       return;
     }
 
@@ -385,10 +381,11 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
 
   // Handle a drag event
   self._handleDrag = function(e) {
+    debugger;
     if (isAsideExposed || !$scope.dragContent) return;
 
     // Set Axis Directions based on side/top menu
-    if (self.content && self.content.side == 'top') {
+    if (self.content.topMenuEnabled) {
       var axisDirection = 'pageY';
       var dragThreshold = self.dragThresholdY;
     } else {
@@ -448,7 +445,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
   self.isDraggableTarget = function(e) {
     //Only restrict edge when sidemenu is closed and restriction is enabled
     var shouldOnlyAllowEdgeDrag = self.edgeThresholdEnabled && !self.isOpen();
-    if ( self.content.side == 'top' ) {
+    if ( self.content.topMenuEnabled ) {
       var startPos = e.gesture.startEvent && e.gesture.startEvent.center &&
         e.gesture.startEvent.center.pageY;
       var dragOffset = self.content.element.offsetHeight; 

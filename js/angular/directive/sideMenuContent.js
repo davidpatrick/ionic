@@ -44,7 +44,7 @@ function($timeout, $ionicGesture, $window) {
       function prelink($scope, $element, $attr, sideMenuCtrl) {
         var startCoord = null;
         var primaryScrollAxis = null;
-        $scope.side = $attr.side || 'left';
+        $scope.topMenuEnabled = $attr.topMenuEnabled || false;
 
         if (isDefined(attr.dragContent)) {
           $scope.$watch(attr.dragContent, function(value) {
@@ -59,7 +59,7 @@ function($timeout, $ionicGesture, $window) {
             sideMenuCtrl.edgeDragThreshold(value);
           });
         // Enable Drag Threshold for Top Menu to avoid interferance with main view
-        } else if ($scope.side == 'top') {
+        } else if ($scope.topMenuEnabled) {
           sideMenuCtrl.edgeDragThreshold(60);
         }
 
@@ -76,7 +76,7 @@ function($timeout, $ionicGesture, $window) {
         }
 
         function onDragX(e) {
-          if (!sideMenuCtrl.isDraggableTarget(e) || $scope.side == 'top') return;
+          if (!sideMenuCtrl.isDraggableTarget(e) || $scope.topMenuEnabled) return;
 
           if (getPrimaryScrollAxis(e) == 'x') {
             sideMenuCtrl._handleDrag(e);
@@ -85,7 +85,7 @@ function($timeout, $ionicGesture, $window) {
         }
 
         function onDragY(e) {
-          if (!sideMenuCtrl.isDraggableTarget(e) || $scope.side !== 'top') return;
+          if (!sideMenuCtrl.isDraggableTarget(e)) return;
 
           if (getPrimaryScrollAxis(e) == 'y') {
             sideMenuCtrl._handleDrag(e);
@@ -206,7 +206,7 @@ function($timeout, $ionicGesture, $window) {
           },
           offsetX: 0,
           offsetY: 0,
-          side: $scope.side
+          topMenuEnabled: $scope.topMenuEnabled
         };
 
         sideMenuCtrl.setContent(content);

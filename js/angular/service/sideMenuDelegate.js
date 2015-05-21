@@ -55,6 +55,14 @@ IonicModule
   'toggleRight',
   /**
    * @ngdoc method
+   * @name $ionicSideMenuDelegate#toggleTop
+   * @description Toggle the top side menu (if it exists).
+   * @param {boolean=} isOpen Whether to open or close the menu.
+   * Default: Toggles the menu.
+   */
+  'toggleTop',
+  /**
+   * @ngdoc method
    * @name $ionicSideMenuDelegate#getOpenRatio
    * @description Gets the ratio of open amount over menu width. For example, a
    * menu of width 100 that is opened by 50 pixels is 50% opened, and would return
