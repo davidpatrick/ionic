@@ -1,6 +1,6 @@
 (function(ionic) {
   var NOOP = function() {};
-  var depreciated = function(name) {
+  var deprecated = function(name) {
     console.error('Method not available in native scrolling: ' + name);
   };
   ionic.views.ScrollNative = ionic.views.View.inherit({
@@ -17,6 +17,16 @@
       self.__clientWidth = self.__content.clientWidth;
       self.__maxScrollTop = Math.max((self.__contentHeight) - self.__clientHeight, 0);
       self.__maxScrollLeft = Math.max((self.__contentWidth) - self.__clientWidth, 0);
+
+      if(options.startY >= 0 || options.startX >= 0) {
+        ionic.requestAnimationFrame(function() {
+          self.el.scrollTop = options.startY || 0;
+          self.el.scrollLeft = options.startX || 0;
+
+          self.__scrollTop = self.el.scrollTop;
+          self.__scrollLeft = self.el.scrollLeft;
+        });
+      }
 
       self.options = {
 
@@ -56,10 +66,10 @@
     },
 
     /**  Methods not used in native scrolling */
-    __callback: function() { depreciated('__callback'); },
-    zoomTo: function() { depreciated('zoomTo'); },
-    zoomBy: function() { depreciated('zoomBy'); },
-    activatePullToRefresh: function() { depreciated('activatePullToRefresh'); },
+    __callback: function() { deprecated('__callback'); },
+    zoomTo: function() { deprecated('zoomTo'); },
+    zoomBy: function() { deprecated('zoomBy'); },
+    activatePullToRefresh: function() { deprecated('activatePullToRefresh'); },
 
     /**
      * Returns the scroll position and zooming values
@@ -199,6 +209,13 @@
         self.resize();
         return;
       }
+
+      var oldOverflowX = self.el.style.overflowX;
+      var oldOverflowY = self.el.style.overflowY;
+
+      self.el.style.overflowY = 'hidden';
+      self.el.style.overflowX = 'hidden';
+
       animateScroll(top, left);
 
       function animateScroll(Y, X) {
@@ -210,6 +227,8 @@
           fromX = self.el.scrollLeft;
 
         if (fromY === Y && fromX === X) {
+          self.el.style.overflowX = oldOverflowX;
+          self.el.style.overflowY = oldOverflowY;
           self.resize();
           return; /* Prevent scrolling to the Y point if already there */
         }
@@ -240,6 +259,8 @@
           } else {
             // done
             ionic.tap.removeClonedInputs(self.__container, self);
+            self.el.style.overflowX = oldOverflowX;
+            self.el.style.overflowY = oldOverflowY;
             self.resize();
           }
         }
@@ -312,6 +333,7 @@
         var alreadyShrunk = self.isShrunkForKeyboard;
 
         var isModal = container.parentNode.classList.contains('modal');
+        var isPopover = container.parentNode.classList.contains('popover');
         // 680px is when the media query for 60% modal width kicks in
         var isInsetModal = isModal && window.innerWidth >= 680;
 
@@ -331,7 +353,7 @@
           // shrink scrollview so we can actually scroll if the input is hidden
           // if it isn't shrink so we can scroll to inputs under the keyboard
           // inset modals won't shrink on Android on their own when the keyboard appears
-          if ( ionic.Platform.isIOS() || ionic.Platform.isFullScreen || isInsetModal ) {
+          if ( !isPopover && (ionic.Platform.isIOS() || ionic.Platform.isFullScreen || isInsetModal) ) {
             // if there are things below the scroll view account for them and
             // subtract them from the keyboard height when resizing
             // E - D                         E                         D
@@ -459,4 +481,3 @@
   });
 
 })(ionic);
-

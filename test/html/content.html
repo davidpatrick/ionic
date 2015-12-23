@@ -18,12 +18,6 @@
 
       <ion-content id="container"
         start-y="55"
-        on-scroll="onScroll(event, scrollTop, scrollLeft)"
-        on-scroll-complete="onScrollComplete(scrollTop, scrollLeft)"
-        on-refresh="onRefresh()"
-        on-refresh-opening="onRefreshOpening(amount)"
-        padding="true"
-        header-shrink="60"
         class="has-tabs has-header">
         <ion-refresher></ion-refresher>
         <div id="search-box" class="bar bar-header item-input-inset">
@@ -34,6 +28,21 @@
           <button class="button button-clear">
             Cancel
           </button>
+        </div>
+        <div class="list">
+          <ion-input class="item item-input">
+            <input type="text" placeholder="First Name">
+          </ion-input>
+          <ion-input class="item item-input">
+            <input type="text" placeholder="Last Name">
+          </ion-input>
+          <ion-input class="item item-input">
+            <textarea placeholder="Comments"></textarea>
+          </ion-input>
+          <ion-input class="item item-input">
+            <ion-label>Username</ion-label>
+            <input type="text">
+          </ion-input>
         </div>
         <div ng-controller="TestCtrl"></div>
         <button ng-click="add()">Click</button>
@@ -74,7 +83,7 @@
         var fadeAmt;
 
         var shrink = function(header, amt, max) {
-          console.log('Translating up', amt);
+          //console.log('Translating up', amt);
           amt = Math.min(max - 20, amt);
           fadeAmt = 1 - amt / (max - 20);
           ionic.requestAnimationFrame(function() {
@@ -95,7 +104,8 @@
             var headerHeight = header.offsetHeight;
 
             $element.bind('scroll', function(e) {
-              if(e.detail.scrollTop > starty) {
+
+              if(e.detail && e.detail.scrollTop > starty) {
                 // Start shrinking
                 shrinkAmt = headerHeight - Math.max(0, (starty + headerHeight) - e.detail.scrollTop);
                 shrink(header, shrinkAmt, headerHeight);
@@ -118,7 +128,7 @@
       })
 
       .controller('TestCtrl', function($scope, $timeout) {
-        console.log('CONSTRUCT');
+        console.log('CONSTRUCT', ionic.Platform.isIOS());
         $timeout(function() {
         });
       })
@@ -139,7 +149,7 @@
           }, 1000);
         };
         $scope.onScroll = function(event, scrollTop, scrollLeft) {
-          console.log('Scroll', scrollTop, scrollLeft);
+          //console.log('Scroll', scrollTop, scrollLeft);
         /*
           if(scrollTop > startTop) {
             var diff = scrollTop - startTop;
