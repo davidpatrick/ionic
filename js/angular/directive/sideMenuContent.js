@@ -76,7 +76,7 @@ function($timeout, $ionicGesture, $window) {
         }
 
         function onDragX(e) {
-          if (!sideMenuCtrl.isDraggableTarget(e) || $scope.topMenuEnabled) return;
+          if (!sideMenuCtrl.isDraggableTarget(e)) return;
 
           if (getPrimaryScrollAxis(e) == 'x') {
             sideMenuCtrl._handleDrag(e);
